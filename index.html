@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cash Money</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-color: #0b0e11;
+      --card-bg: #151a21;
+      --accent: #f0b90b;
+      --text-main: #eaecef;
+      --text-muted: #848e9c;
+      --border: #2b313a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 80px;
+    }
+
+    /* Top Header */
+    .app-header {
+      background: var(--card-bg);
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+
+    .main-container {
+      padding: 16px;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    /* Balance Banner */
+    .balance-banner {
+      background: linear-gradient(135deg, #202630, #151a21);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .balance-title {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .balance-amount {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* Section Cards */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    /* Investment Plans list */
+    .plan-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .plan-row:last-child {
+      border-bottom: none;
+    }
+
+    .plan-info div:first-child {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .plan-info div:last-child {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .plan-profit {
+      background: rgba(14, 203, 129, 0.1);
+      color: #0ecb81;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* Form Inputs */
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .text-input {
+      width: 100%;
+      background: var(--bg-color);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* Action Buttons */
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn-primary:active {
+      opacity: 0.8;
+    }
+
+    /* Wallet box */
+    .wallet-box {
+      background: var(--bg-color);
+      border: 1px dashed var(--accent);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .wallet-text {
+      font-size: 12px;
+      color: var(--text-main);
+      word-break: break-all;
+      font-family: monospace;
+      margin-bottom: 8px;
+    }
+
+    .btn-copy {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Bottom Navigation Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 25%;
+    }
+
+    .nav-btn.active {
+      color: var(--accent);
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-header">CASH MONEY</div>
+
+  <div class="main-container">
+
+    <!-- TAB 1: ACCUEIL -->
+    <div id="tab-home" class="tab-pane active">
+      <div class="balance-banner">
+        <div class="balance-title">Solde Global du Compte</div>
+        <div class="balance-amount">15.00 $</div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Plans d'Investissement Actifs</div>
+        
+        <div class="plan-row">
+          <div class="plan-info">
+            <div>Pack Starter</div>
+            <div>Min: 5$ - 24h</div>
+          </div>
+          <div class="plan-profit">+0.50 $</div>
+        </div>
+
+        <div class="plan-row">
+          <div class="plan-info">
+            <div>Pack Silver</div>
+            <div>Min: 10$ - 24h</div>
+          </div>
+          <div class="plan-profit">+0.10 $</div>
+        </div>
+
+        <div class="plan-row">
+          <div class="plan-info">
+            <div>Pack Gold</div>
+            <div>Min: 20$ - 24h</div>
+          </div>
+          <div class="plan-profit">+0.20 $</div>
+        </div>
+
+        <div class="plan-row">
+          <div class="plan-info">
+            <div>Pack Platinum</div>
+            <div>Min: 30$ - 24h</div>
+          </div>
+          <div class="plan-profit">+0.30 $</div>
+        </div>
+
+        <div class="plan-row">
+          <div class="plan-info">
+            <div>Pack Diamond</div>
+            <div>Min: 40$ - 24h</div>
+          </div>
+          <div class="plan-profit">+0.40 $</div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Calculateur de Profit</div>
+        <div class="input-group">
+          <label class="input-label">Montant à investir ($)</label>
+          <input type="number" id="calcAmt" class="text-input" value="20" oninput="runCalc()">
+        </div>
+        <div id="calcRes" style="font-size: 13px; color: #0ecb81; font-weight: 600; margin-top: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DÉPÔT -->
+    <div id="tab-deposit" class="tab-pane">
+      <div class="section-card">
+        <div class="section-title">Effectuer un Dépôt (USDT BEP20)</div>
+        
+        <div class="wallet-box">
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Adresse de dépôt officielle :</div>
+          <div class="wallet-text">0x71C83e42A912B294fa38C912</div>
+          <button class="btn-copy" onclick="copyText('0x71C83e42A912B294fa38C912')">Copier l'adresse</button>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Montant Déposé ($)</label>
+          <input type="number" id="depVal" class="text-input" placeholder="0.00">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">ID de Transaction (TXID)</label>
+          <input type="text" id="txVal" class="text-input" placeholder="Coller le TXID ici">
+        </div>
+
+        <button class="btn-primary" onclick="sendDep()">Confirmer le Dépôt</button>
+      </div>
+    </div>
+
+    <!-- TAB 3: RETRAIT -->
+    <div id="tab-withdraw" class="tab-pane">
+      <div class="section-card">
+        <div class="section-title">Demande de Retrait</div>
+        
+        <div style="background: rgba(240, 185, 11, 0.05); border: 1px solid rgba(240, 185, 11, 0.2); padding: 12px; border-radius: 8px; margin-bottom: 14px; font-size: 13px;">
+          Disponible : <strong style="color: #0ecb81;">15.00 $</strong><br>
+          <span style="color: var(--text-muted); font-size: 11px;">Minimum 1.00$ • Traitement 24h</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Montant à Retirer ($)</label>
+          <input type="number" id="witVal" class="text-input" placeholder="Minimum 1$">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Adresse USDT (BEP20)</label>
+          <input type="text" id="witWallet" class="text-input" placeholder="0x...">
+        </div>
+
+        <button class="btn-primary" onclick="sendWit()">Soumettre le Retrait</button>
+      </div>
+    </div>
+
+    <!-- TAB 4: PROFIL -->
+    <div id="tab-profile" class="tab-pane">
+      <div class="section-card">
+        <div class="section-title">Mon Profil & Équipe</div>
+        
+        <div style="font-size: 13px; line-height: 26px; color: var(--text-main); margin-bottom: 14px;">
+          👤 Compte : <strong style="color: #fff;">Membre VIP</strong><br>
+          💰 Solde Total : <strong style="color: #0ecb81;">15.00 $</strong><br>
+          👥 Filleuls Directs : <strong style="color: var(--accent);">0</strong><br>
+          📈 Bonus Parrainage : <strong style="color: #38bdf8;">0.00 $</strong>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Lien de Parrainage</label>
+          <input type="text" id="refUrl" class="text-input" value="https://t.me/CashMoneyInvBot?start=ref123" readonly>
+        </div>
+
+        <button class="btn-primary" onclick="copyText('https://t.me/CashMoneyInvBot?start=ref123')">Copier le Lien</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="nav-bar">
+    <button class="nav-btn active" onclick="switchTab('tab-home', this)">
+      <span class="nav-icon">🏠</span>
+      <span>Accueil</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-deposit', this)">
+      <span class="nav-icon">📥</span>
+      <span>Dépôt</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-withdraw', this)">
+      <span class="nav-icon">📤</span>
+      <span>Retrait</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-profile', this)">
+      <span class="nav-icon">👤</span>
+      <span>Profil</span>
+    </button>
+  </div>
+
+  <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+
+    function switchTab(id, el) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(id).classList.add('active');
+      el.classList.add('active');
+    }
+
+    function runCalc() {
+      let v = parseFloat(document.getElementById('calcAmt').value) || 0;
+      document.getElementById('calcRes').innerText = "Profit estimé (24h) : +" + (v * 0.10).toFixed(2) + " $";
+    }
+    runCalc();
+
+    function copyText(txt) {
+      navigator.clipboard.writeText(txt);
+      alert("Copié avec succès !");
+    }
+
+    function sendDep() {
+      let a = document.getElementById('depVal').value;
+      let t = document.getElementById('txVal').value;
+      if (!a || !t) { alert("Ranpli tout chan yo!"); return; }
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({action: "deposit", amount: a, txid: t}));
+      } else {
+        alert("Dépôt soumèt!");
+      }
+    }
+
+    function sendWit() {
+      let a = document.getElementById('witVal').value;
+      let w = document.getElementById('witWallet').value;
+      if (!a || a < 1 || !w) { alert("Verifye montan an (min 1$) ak adrès la!"); return; }
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({action: "withdraw", amount: a, wallet: w}));
+      } else {
+        alert("Demann retrè anrejistre!");
+      }
+    }
+  </script>
+</body>
+</html>

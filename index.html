@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cash Money - Financial App</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-color: #f0f4f8;
+      --card-bg: #ffffff;
+      --primary-blue: #0066ff;
+      --primary-dark: #0040a8;
+      --accent-cyan: #00d2ff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --card-shadow: 0 10px 25px -5px rgba(0, 102, 255, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 85px;
+    }
+
+    .app-header {
+      background: #ffffff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--primary-blue);
+      letter-spacing: 0.5px;
+    }
+
+    .notif-btn {
+      position: relative;
+      background: rgba(0, 102, 255, 0.08);
+      border: 1px solid rgba(0, 102, 255, 0.15);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-container {
+      padding: 16px;
+      max-width: 450px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .hero-balance {
+      background: linear-gradient(135deg, #0066ff 0%, #0040a8 100%);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      color: #ffffff;
+      box-shadow: 0 12px 30px rgba(0, 102, 255, 0.25);
+    }
+
+    .balance-label {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .balance-val {
+      font-size: 36px;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 8px 0 18px 0;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-quick {
+      flex: 1;
+      background: #ffffff;
+      color: var(--primary-blue);
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .btn-quick.outline {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: none;
+    }
+
+    .active-invest-card {
+      background: #ffffff;
+      border: 2px solid var(--primary-blue);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .active-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .active-plan-name {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text-dark);
+    }
+
+    .timer-display {
+      font-size: 22px;
+      font-weight: 900;
+      color: #059669;
+      margin: 10px 0;
+      font-family: monospace;
+    }
+
+    .progress-bar-bg {
+      background: #e2e8f0;
+      height: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #0066ff, #00d2ff);
+      height: 100%;
+      width: 0%;
+      transition: width 1s linear;
+    }
+
+    .section-head {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--text-dark);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .plan-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .plan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .plan-title {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--text-dark);
+    }
+
+    .plan-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .plan-profit {
+      background: rgba(0, 102, 255, 0.08);
+      color: var(--primary-blue);
+      border: 1px solid rgba(0, 102, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .btn-invest-plan {
+      width: 100%;
+      background: linear-gradient(135deg, #0066ff 0%, #0040a8 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+    }
+
+    .form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .field-input {
+      width: 100%;
+      background: #f8fafc;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--text-dark);
+      font-size: 15px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .btn-main {
+      width: 100%;
+      background: linear-gradient(135deg, #0066ff 0%, #0040a8 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0, 102, 255, 0.25);
+    }
+
+    .crypto-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .crypto-opt {
+      flex: 1;
+      border: 2px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+    }
+
+    .crypto-opt img {
+      width: 26px;
+      height: 26px;
+    }
+
+    .crypto-opt.active {
+      border-color: var(--primary-blue);
+      background: rgba(0, 102, 255, 0.05);
+      color: var(--primary-blue);
+    }
+
+    .wallet-box {
+      background: #f0f7ff;
+      border: 1.5px dashed var(--primary-blue);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .qr-container {
+      width: 130px;
+      height: 130px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin: 0 auto 12px auto;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .wallet-addr {
+      font-size: 12px;
+      font-family: monospace;
+      font-weight: 800;
+      color: var(--primary-dark);
+      word-break: break-all;
+      margin-bottom: 12px;
+      background: #ffffff;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-copy {
+      background: #ffffff;
+      color: var(--primary-blue);
+      border: 1.5px solid var(--primary-blue);
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .community-stat {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .user-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.04);
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      width: 20%;
+      gap: 3px;
+    }
+
+    .nav-btn.active {
+      color: var(--primary-blue);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .modal-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .modal-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 20px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .btn-modal {
+      width: 100%;
+      background: var(--primary-blue);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="app-header">
+    <div class="brand-title">CASH MONEY</div>
+    <div class="notif-btn" onclick="openNotifs()">
+      🔔
+      <div class="notif-badge" id="notifBadge">0</div>
+    </div>
+  </div>
+
+  <div class="main-container">
+
+    <!-- ACCUEIL -->
+    <div id="tab-home" class="tab-content active">
+      <div class="hero-balance">
+        <div class="balance-label">Solde du Compte</div>
+        <div class="balance-val" id="userBalanceDisplay">0.00 $</div>
+
+        <div class="quick-actions">
+          <button class="btn-quick" onclick="switchTab('tab-deposit')">Faire un Dépôt</button>
+          <button class="btn-quick outline" onclick="switchTab('tab-withdraw')">Retrait</button>
+        </div>
+      </div>
+
+      <!-- INVESTISSEMENT ACTIF -->
+      <div id="activeInvestCard" class="active-invest-card" style="display: none;">
+        <div class="active-title">⏳ Investissement Actif (Cycle 24h)</div>
+        <div class="active-plan-name" id="activePlanName">--</div>
+        <div class="timer-display" id="activeTimer">23:59:59</div>
+        <div style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Gain estimé : <strong style="color: #059669;" id="activeGain">+0.00 $</strong></div>
+        <div class="progress-bar-bg">
+          <div id="progressBarFill" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="section-head">Plans d'Investissement</div>
+
+      <div class="plan-card">
+        <div class="plan-header">
+          <div>
+            <div class="plan-title">Pack Starter</div>
+            <div class="plan-sub">Min: 5$ • Durée: 24h</div>
+          </div>
+          <div class="plan-profit">+0.50 $</div>
+        </div>
+        <button class="btn-invest-plan" onclick="startPlan('Pack Starter', 5, 0.50)">Investir 5$</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-header">
+          <div>
+            <div class="plan-title">Pack Silver</div>
+            <div class="plan-sub">Min: 10$ • Durée: 24h</div>
+          </div>
+          <div class="plan-profit">+0.10 $</div>
+        </div>
+        <button class="btn-invest-plan" onclick="startPlan('Pack Silver', 10, 0.10)">Investir 10$</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-header">
+          <div>
+            <div class="plan-title">Pack Gold</div>
+            <div class="plan-sub">Min: 20$ • Durée: 24h</div>
+          </div>
+          <div class="plan-profit">+0.20 $</div>
+        </div>
+        <button class="btn-invest-plan" onclick="startPlan('Pack Gold', 20, 0.20)">Investir 20$</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-header">
+          <div>
+            <div class="plan-title">Pack Platinum</div>
+            <div class="plan-sub">Min: 30$ • Durée: 24h</div>
+          </div>
+          <div class="plan-profit">+0.30 $</div>
+        </div>
+        <button class="btn-invest-plan" onclick="startPlan('Pack Platinum', 30, 0.30)">Investir 30$</button>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-header">
+          <div>
+            <div class="plan-title">Pack Diamond</div>
+            <div class="plan-sub">Min: 40$ • Durée: 24h</div>
+          </div>
+          <div class="plan-profit">+0.40 $</div>
+        </div>
+        <button class="btn-invest-plan" onclick="startPlan('Pack Diamond', 40, 0.40)">Investir 40$</button>
+      </div>
+
+      <div class="form-card" style="margin-top: 20px;">
+        <div class="section-head">Calculateur de Rendement</div>
+        <div class="field-group">
+          <label class="field-label">Montant à investir ($)</label>
+          <input type="number" id="calcInput" class="field-input" value="20" oninput="runCalc()">
+        </div>
+        <div id="calcRes" style="font-size: 14px; color: var(--primary-blue); font-weight: 900;"></div>
+      </div>
+    </div>
+
+    <!-- DÉPÔT -->
+    <div id="tab-deposit" class="tab-content">
+      <div class="form-card">
+        <div class="section-head">Effectuer un Dépôt</div>
+
+        <div class="crypto-selector">
+          <div id="optBEP" class="crypto-opt active" onclick="selectCrypto('BEP20')">
+            <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=025" alt="BEP20">
+            USDT (BEP20)
+          </div>
+          <div id="optTRC" class="crypto-opt" onclick="selectCrypto('TRC20')">
+            <img src="https://cryptologos.cc/logos/tron-trx-logo.svg?v=025" alt="TRC20">
+            USDT (TRC20)
+          </div>
+        </div>
+
+        <div class="wallet-box">
+          <div class="qr-container">
+            <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=0x7fD50dAAfeA0a8Df3E4860ECC81939fFBaa11396" alt="QR Code">
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;" id="networkLabel">Adresse Officielle USDT (BEP20)</div>
+          <div class="wallet-addr" id="activeWalletAddr">0x7fD50dAAfeA0a8Df3E4860ECC81939fFBaa11396</div>
+          <button class="btn-copy" onclick="copyWallet()">Copier L'Adresse</button>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Montant Déposé ($)</label>
+          <input type="number" id="depVal" class="field-input" placeholder="Ex: 20">
+        </div>
+
+        <button class="btn-main" onclick="submitDeposit()">Confirmer le Dépôt</button>
+      </div>
+    </div>
+
+    <!-- RETRAIT -->
+    <div id="tab-withdraw" class="tab-content">
+      <div class="form-card">
+        <div class="section-head">Demande de Retrait</div>
+
+        <div style="background: rgba(0, 102, 255, 0.06); border: 1.5px solid rgba(0, 102, 255, 0.2); padding: 16px; border-radius: 14px; margin-bottom: 18px;">
+          <div style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Solde Retirable</div>
+          <div style="font-size: 26px; font-weight: 900; color: var(--primary-blue); margin-top: 2px;" id="withdrawableBalanceDisplay">0.00 $</div>
+          <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 4px;">Retrait Minimum: 1.00$</div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Montant à Retirer ($)</label>
+          <input type="number" id="witVal" class="field-input" placeholder="Minimum 1$">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Adresse USDT (BEP20 ou TRC20)</label>
+          <input type="text" id="witWallet" class="field-input" placeholder="0x... ou T...">
+        </div>
+
+        <button class="btn-main" onclick="submitWithdraw()">Soumettre le Retrait</button>
+      </div>
+    </div>
+
+    <!-- PROFIL -->
+    <div id="tab-profile" class="tab-content">
+      <div class="form-card">
+        <div class="section-head">Mon Profil & Statistiques</div>
+
+        <div style="font-size: 13px; line-height: 28px; margin-bottom: 18px; font-weight: 700;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+            <span>ID Telegram :</span> <strong style="color: var(--primary-blue);" id="profTgId">Non Détecté</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 6px 0;">
+            <span>Statut Compte :</span> <strong style="color: #059669;">VIP ACTIF</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 6px 0;">
+            <span>Total Investi :</span> <strong id="profTotalInvest">0.00 $</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 6px 0;">
+            <span>Total Retiré :</span> <strong style="color: #059669;" id="profTotalWit">0.00 $</strong>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Lien de Parrainage Officiel</label>
+          <input type="text" id="refLink" class="field-input" value="" readonly>
+        </div>
+
+        <button class="btn-main" onclick="copyRef()">Copier le Lien</button>
+      </div>
+    </div>
+
+    <!-- COMMUNAUTÉ -->
+    <div id="tab-community" class="tab-content">
+      <div class="community-stat">
+        <div style="font-size: 12px; color: var(--text-muted); font-weight: 700;">MEMBRES ACTIFS DANS LE MONDE</div>
+        <div style="font-size: 32px; font-weight: 900; color: #00d2ff;" id="liveUserCount">1,542</div>
+        <div style="font-size: 11px; color: #059669; font-weight: 700; margin-top: 4px;">● Mise à jour en temps réel</div>
+      </div>
+
+      <div class="form-card">
+        <div class="section-head">Dernières Activités</div>
+        <div id="communityList"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Popup -->
+  <div class="modal-overlay" id="customModal">
+    <div class="modal-card">
+      <div class="modal-icon" id="modalIcon">🔔</div>
+      <div class="modal-title" id="modalTitle">Notification</div>
+      <div class="modal-text" id="modalText">Ceci est un message de notification.</div>
+      <button class="btn-modal" onclick="closeCustomModal()">D'accord</button>
+    </div>
+  </div>
+
+  <!-- Modal Notifications List -->
+  <div class="modal-overlay" id="notifModal">
+    <div class="modal-card" style="text-align: left;">
+      <div class="section-head" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Notifications</span>
+        <span style="cursor: pointer; font-size: 18px;" onclick="closeNotifs()">✖</span>
+      </div>
+      <div style="font-size: 13px; line-height: 22px;" id="notifListContainer"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav Bar -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('tab-home', this)">
+      <span style="font-size: 20px;">🏠</span>
+      <span>Accueil</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-deposit', this)">
+      <span style="font-size: 20px;">📥</span>
+      <span>Dépôt</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-withdraw', this)">
+      <span style="font-size: 20px;">📤</span>
+      <span>Retrait</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-community', this)">
+      <span style="font-size: 20px;">🌐</span>
+      <span>Communauté</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-profile', this)">
+      <span style="font-size: 20px;">👤</span>
+      <span>Profil</span>
+    </button>
+  </div>
+
+  <script>
+    /* INITIALISATION TELEGRAM WEBAPP */
+    let tgUserId = "guest_user";
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+      if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+        tgUserId = window.Telegram.WebApp.initDataUnsafe.user.id.toString();
+      }
+    }
+
+    // Gestion du stockage local synchronisé avec l'ID Telegram
+    let storageKey = "cashmoney_user_" + tgUserId;
+    let userData = JSON.parse(localStorage.getItem(storageKey)) || {
+      balance: 0.00,
+      withdrawable: 0.00,
+      totalInvested: 0.00,
+      totalWithdrawn: 0.00,
+      activePlan: null,
+      notifications: [{ text: "Bienvenue sur Cash Money !", time: "Aujourd'hui" }]
+    };
+
+    function saveUserData() {
+      localStorage.setItem(storageKey, JSON.stringify(userData));
+      updateUI();
+    }
+
+    function updateUI() {
+      document.getElementById('userBalanceDisplay').innerText = userData.balance.toFixed(2) + " $";
+      document.getElementById('withdrawableBalanceDisplay').innerText = userData.withdrawable.toFixed(2) + " $";
+      document.getElementById('profTotalInvest').innerText = userData.totalInvested.toFixed(2) + " $";
+      document.getElementById('profTotalWit').innerText = userData.totalWithdrawn.toFixed(2) + " $";
+      document.getElementById('profTgId').innerText = tgUserId;
+      document.getElementById('refLink').value = "https://t.me/CashMoneyInvBot?start=ref_" + tgUserId;
+    }
+
+    let selectedNetwork = 'BEP20';
+    let timerInterval = null;
+
+    const wallets = {
+      BEP20: "0x7fD50dAAfeA0a8Df3E4860ECC81939fFBaa11396",
+      TRC20: "TYDHcrwhGkRH68u2fWat72iJoNFqhoadHy"
+    };
+
+    function switchTab(id, btn) {
+      document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(id).classList.add('active');
+      if (btn) btn.classList.add('active');
+    }
+
+    function selectCrypto(net) {
+      selectedNetwork = net;
+      document.getElementById('optBEP').classList.toggle('active', net === 'BEP20');
+      document.getElementById('optTRC').classList.toggle('active', net === 'TRC20');
+      document.getElementById('networkLabel').innerText = "Adresse Officielle USDT (" + net + ")";
+      document.getElementById('activeWalletAddr').innerText = wallets[net];
+      document.getElementById('qrImage').src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + wallets[net];
+    }
+
+    function runCalc() {
+      let v = parseFloat(document.getElementById('calcInput').value) || 0;
+      document.getElementById('calcRes').innerText = "Profit estimé (24h) : +" + (v * 0.10).toFixed(2) + " $";
+    }
+    runCalc();
+
+    function showPopup(icon, title, text) {
+      document.getElementById('modalIcon').innerText = icon;
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalText').innerText = text;
+      document.getElementById('customModal').style.display = 'flex';
+    }
+
+    function closeCustomModal() {
+      document.getElementById('customModal').style.display = 'none';
+    }
+
+    function addNotification(text) {
+      userData.notifications.unshift({ text: text, time: "À l'instant" });
+      saveUserData();
+      renderNotifs();
+    }
+
+    function renderNotifs() {
+      let badge = document.getElementById('notifBadge');
+      badge.innerText = userData.notifications.length;
+      badge.style.display = 'flex';
+
+      let container = document.getElementById('notifListContainer');
+      container.innerHTML = "";
+      userData.notifications.forEach(n => {
+        container.innerHTML += `
+          <div style="border-bottom: 1px solid var(--border-color); padding: 8px 0;">
+            🔔 <strong>${n.text}</strong><br>
+            <span style="font-size: 11px; color: var(--text-muted);">${n.time}</span>
+          </div>
+        `;
+      });
+    }
+
+    function copyWallet() {
+      navigator.clipboard.writeText(wallets[selectedNetwork]);
+      showPopup("💎", "Adresse Copiée", "L'adresse " + selectedNetwork + " a été copiée avec succès !");
+    }
+
+    function copyRef() {
+      let link = document.getElementById('refLink');
+      navigator.clipboard.writeText(link.value);
+      showPopup("🔗", "Lien Copié", "Votre lien de parrainage a été copié !");
+    }
+
+    /* GESTION DU CYCLE D'INVESTISSEMENT DE 24H */
+    function checkActiveInvest() {
+      if (!userData.activePlan) {
+        document.getElementById('activeInvestCard').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('activeInvestCard').style.display = 'block';
+      document.getElementById('activePlanName').innerText = userData.activePlan.name + " (" + userData.activePlan.amount + "$)";
+      document.getElementById('activeGain').innerText = "+" + userData.activePlan.profit.toFixed(2) + " $";
+
+      let totalSeconds = 24 * 3600;
+      let elapsedTime = Math.floor((Date.now() - userData.activePlan.startTime) / 1000);
+      let remainingSeconds = totalSeconds - elapsedTime;
+
+      if (timerInterval) clearInterval(timerInterval);
+
+      if (remainingSeconds <= 0) {
+        userData.withdrawable += (userData.activePlan.amount + userData.activePlan.profit);
+        let profitAmt = userData.activePlan.profit;
+        userData.activePlan = null;
+        saveUserData();
+
+        addNotification("Cycle de 24h terminé ! Profit de +" + profitAmt.toFixed(2) + "$ ajouté au solde retirable.");
+        showPopup("🎉", "Cycle Terminé", "Votre cycle de 24h est terminé ! Profit ajouté au solde retirable.");
+        document.getElementById('activeInvestCard').style.display = 'none';
+      } else {
+        timerInterval = setInterval(() => {
+          elapsedTime = Math.floor((Date.now() - userData.activePlan.startTime) / 1000);
+          remainingSeconds = totalSeconds - elapsedTime;
+
+          if (remainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            checkActiveInvest();
+            return;
+          }
+
+          let hrs = Math.floor(remainingSeconds / 3600);
+          let mins = Math.floor((remainingSeconds % 3600) / 60);
+          let secs = remainingSeconds % 60;
+
+          document.getElementById('activeTimer').innerText = 
+            (hrs < 10 ? "0" : "") + hrs + ":" + 
+            (mins < 10 ? "0" : "") + mins + ":" + 
+            (secs < 10 ? "0" : "") + secs;
+
+          let pct = (elapsedTime / totalSeconds) * 100;
+          document.getElementById('progressBarFill').style.width = pct + "%";
+        }, 1000);
+      }
+    }
+
+    function startPlan(name, amount, profit) {
+      if (userData.balance < amount) {
+        showPopup("⚠️", "Solde Insuffisant", "Votre solde est de " + userData.balance.toFixed(2) + "$. Veuillez faire un dépôt.");
+        switchTab('tab-deposit');
+        return;
+      }
+
+      if (userData.activePlan) {
+        showPopup("⚠️", "Plan déjà Actif", "Vous avez déjà un plan en cours. Attendez la fin des 24h.");
+        return;
+      }
+
+      userData.balance -= amount;
+      userData.totalInvested += amount;
+      userData.activePlan = {
+        name: name,
+        amount: amount,
+        profit: profit,
+        startTime: Date.now()
+      };
+
+      saveUserData();
+      checkActiveInvest();
+      showPopup("🚀", "Plan Activé", "Le " + name + " a été activé avec succès ! Le cycle de 24h commence.");
+    }
+
+    /* TRANSMISSION DES DONNÉES À BOTS.BUSINESS */
+    function submitDeposit() {
+      let a = parseFloat(document.getElementById('depVal').value);
+      if (!a || a <= 0) {
+        showPopup("❌", "Erreur", "Veuillez entrer un montant de dépôt valide.");
+        return;
+      }
+      
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({
+          action: "deposit", 
+          amount: a, 
+          network: selectedNetwork,
+          user_id: tgUserId
+        }));
+      }
+      
+      addNotification("Demande de dépôt de " + a.toFixed(2) + "$ transmise. Vérification en cours...");
+      showPopup("⏳", "Dépôt Enregistré", "Votre demande de dépôt de " + a.toFixed(2) + "$ a été prise en compte. Vérification du transfert en cours !");
+      document.getElementById('depVal').value = "";
+      switchTab('tab-home');
+    }
+
+    function submitWithdraw() {
+      let a = parseFloat(document.getElementById('witVal').value);
+      let w = document.getElementById('witWallet').value;
+
+      if (!a || a < 1) {
+        showPopup("⚠️", "Montant Invalide", "Le montant minimum de retrait est de 1.00$.");
+        return;
+      }
+
+      if (!w || w.length < 10) {
+        showPopup("⚠️", "Adresse Invalide", "Veuillez entrer une adresse USDT valide.");
+        return;
+      }
+
+      if (a > userData.withdrawable) {
+        showPopup("❌", "Solde Insuffisant", "Votre solde retirable actuel est de " + userData.withdrawable.toFixed(2) + "$.");
+        return;
+      }
+
+      userData.withdrawable -= a;
+      userData.totalWithdrawn += a;
+      saveUserData();
+
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({
+          action: "withdraw", 
+          amount: a, 
+          wallet: w,
+          user_id: tgUserId
+        }));
+      }
+
+      addNotification("Demande de retrait de " + a.toFixed(2) + "$ enregistrée avec succès.");
+      showPopup("💸", "Demande Enregistrée", "Votre demande de retrait de " + a.toFixed(2) + "$ a été enregistrée avec succès.");
+      document.getElementById('witVal').value = "";
+      document.getElementById('witWallet').value = "";
+    }
+
+    function openNotifs() {
+      document.getElementById('notifBadge').innerText = '0';
+      document.getElementById('notifModal').style.display = 'flex';
+    }
+    function closeNotifs() {
+      document.getElementById('notifModal').style.display = 'none';
+    }
+
+    /* COMMUNAUTÉ EN DIRECT */
+    const initialUsers = [
+      { name: "Jean-Luc D.", flag: "🇫🇷", action: "a investi 30$", time: "Il y a 2 min" },
+      { name: "Kouassi A.", flag: "🇨🇮", action: "a retiré 15$", time: "Il y a 5 min" },
+      { name: "Mamadou S.", flag: "🇸🇳", action: "a investi 40$", time: "Il y a 8 min" },
+      { name: "Jean-Baptiste P.", flag: "🇭🇹", action: "a investi 20$", time: "Il y a 12 min" },
+      { name: "Samuel O.", flag: "🇨🇲", action: "a retiré 8$", time: "Il y a 15 min" },
+      { name: "Joseph M.", flag: "🇭🇹", action: "a investi 5$", time: "Il y a 18 min" }
+    ];
+
+    function renderCommunity() {
+      const container = document.getElementById('communityList');
+      container.innerHTML = "";
+      initialUsers.forEach(u => {
+        container.innerHTML += `
+          <div class="user-item">
+            <div>${u.flag} <strong>${u.name}</strong> <span style="font-size:11px; color:var(--text-muted);">${u.action}</span></div>
+            <div style="font-size:11px; color:var(--text-muted);">${u.time}</div>
+          </div>
+        `;
+      });
+    }
+    renderCommunity();
+
+    let count = 1542;
+    setInterval(() => {
+      count += Math.floor(Math.random() * 2) + 1;
+      document.getElementById('liveUserCount').innerText = count.toLocaleString();
+    }, 4000);
+
+    // Initialisation globale
+    updateUI();
+    renderNotifs();
+    checkActiveInvest();
+  </script>
+</body>
+</html>
